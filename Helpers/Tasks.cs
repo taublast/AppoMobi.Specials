@@ -3,8 +3,6 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
-using Timer = System.Timers.Timer;
 
 namespace AppoMobi.Specials.Helpers;
 
@@ -14,11 +12,89 @@ public class Tasks
 
 	protected static ConcurrentDictionary<string, RunningTimer> Timers { get; } = new();
 
-	protected void SetTimer(double interval)
+	/// <summary>
+	/// In MS
+	/// </summary>
+	/// <param name="interval"></param>
+	protected void SetTimer(double ms)
 	{
-		_timer = new Timer(interval);
+		_timer = new Timer(ms);
 		_timer.Elapsed += NotifyTimerElapsed;
 		_timer.Enabled = true;
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="delay"></param>
+	/// <param name="task"></param>
+	public static void StartDelayedAsync(TimeSpan delay, Func<Task> task)
+	{
+		StartDelayedAsync(delay, default, task);
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="delay"></param>
+	/// <param name="cancellationToken"></param>
+	/// <param name="task"></param>
+	public static void StartDelayedAsync(TimeSpan delay, CancellationToken cancellationToken, Func<Task> task)
+	{
+		Task.Run(async () =>
+		{
+			try
+			{
+				await Task.Delay(delay, cancellationToken);
+				await task();
+			}
+			catch (OperationCanceledException)
+			{
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+			}
+
+		}).ConfigureAwait(false);
+
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="delay"></param>
+	/// <param name="action"></param>
+	public static void StartDelayed(TimeSpan delay, Action action)
+	{
+		StartDelayed(delay, default, action);
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="delay"></param>
+	/// <param name="cancellationToken"></param>
+	/// <param name="action"></param>
+	public static void StartDelayed(TimeSpan delay, CancellationToken cancellationToken, Action action)
+	{
+		Task.Run(async () =>
+		{
+			try
+			{
+				await Task.Delay(delay, cancellationToken);
+				action();
+			}
+			catch (OperationCanceledException)
+			{
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+			}
+
+		}).ConfigureAwait(false);
+
 	}
 
 	public static void StartTimerAsync(TimeSpan when, Func<Task<bool>> task)
@@ -70,7 +146,7 @@ public class Tasks
 						myself.Timer.Dispose();
 						Timers[myself.Id] = null;
 #if DEBUG
-                        //Console.WriteLine($"[StartTimer] Stopped timer {id}");
+						//Console.WriteLine($"[StartTimer] Stopped timer {id}");
 #endif
 					}
 			}
@@ -106,7 +182,7 @@ public class Tasks
 		//Debug.WriteLine($"[BackgroundTaskQueue] Added task on timer {id}");
 
 #if DEBUG
-        //Console.WriteLine($"[StartTimer] Added task on timer delay {logTimer.StartDelay} repeat {logTimer.RepeatingDelay} id  {id}");
+		//Console.WriteLine($"[StartTimer] Added task on timer delay {logTimer.StartDelay} repeat {logTimer.RepeatingDelay} id  {id}");
 #endif
 	}
 
@@ -119,7 +195,7 @@ public class Tasks
 
 	public event Action OnElapsed;
 
-	private void NotifyTimerElapsed(object source, ElapsedEventArgs e)
+	private void NotifyTimerElapsed(object source, TimerElapsedEventArgs timerElapsedEventArgs)
 	{
 		_timer.Enabled = false;
 		_timer.Elapsed -= NotifyTimerElapsed;
