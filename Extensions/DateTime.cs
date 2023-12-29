@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AppoMobi.Specials.Extensions;
+namespace AppoMobi.Specials;
 
 public static class DateTimeExtensions
 {

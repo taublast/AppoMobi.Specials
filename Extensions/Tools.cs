@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace AppoMobi.Specials.Extensions;
+namespace AppoMobi.Specials;
 
 public static class UsefulExtensions
 {

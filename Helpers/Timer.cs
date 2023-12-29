@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Threading;
 
-namespace AppoMobi.Specials.Helpers;
+namespace AppoMobi.Specials;
 
 public class TimerElapsedEventArgs : EventArgs
 {

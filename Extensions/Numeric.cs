@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace AppoMobi.Specials.Extensions;
+namespace AppoMobi.Specials;
 
 public static class NumericExtensions
 

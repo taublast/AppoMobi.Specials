@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json.Linq;
 
-namespace AppoMobi.Specials.Extensions;
+namespace AppoMobi.Specials;
 
 public static class JObjectExtensions
 {

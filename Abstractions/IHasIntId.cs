@@ -1,4 +1,4 @@
-﻿namespace AppoMobi.Specials.Abstractions;
+﻿namespace AppoMobi.Specials;
 
 public interface IHasIntId
 {

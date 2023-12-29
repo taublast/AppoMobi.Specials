@@ -3,7 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace AppoMobi.Specials.Extensions;
+namespace AppoMobi.Specials;
 
 public static class AttributesExtensions
 

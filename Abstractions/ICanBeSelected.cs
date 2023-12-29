@@ -1,6 +1,6 @@
-﻿namespace AppoMobi.Specials.Abstractions;
+﻿namespace AppoMobi.Specials;
 
 public interface ICanBeSelected
 {
-	bool Selected { get; set; }
+    bool Selected { get; set; }
 }

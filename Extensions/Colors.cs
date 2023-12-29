@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 
-namespace AppoMobi.Specials.Extensions;
+namespace AppoMobi.Specials;
 
 public static class ColorExtensions
 {

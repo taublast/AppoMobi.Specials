@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Resources;
-using AppoMobi.Specials.Extensions;
+using AppoMobi.Specials;
 
 namespace AppoMobi.Specials.Localization;
 
