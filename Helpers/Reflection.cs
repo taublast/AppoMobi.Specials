@@ -175,7 +175,7 @@ public static class Reflection
         if (!CachedProperties.TryGetValue(typeSource, out var sourcePropsInfos))
         {
             var source = typeSource.GetProperties();
-            sourcePropsInfos = source.DistinctBy(x => x.Name).ToArray();
+            sourcePropsInfos = source.DistinctionBy(x => x.Name).ToArray();
             CachedProperties.TryAdd(typeSource, sourcePropsInfos);
         }
 
@@ -183,7 +183,7 @@ public static class Reflection
         if (!CachedProperties.TryGetValue(typeTarget, out var targetPropsInfos))
         {
             var target = typeTarget.GetProperties();
-            targetPropsInfos = target.DistinctBy(x => x.Name).ToArray();
+            targetPropsInfos = target.DistinctionBy(x => x.Name).ToArray();
             CachedProperties.TryAdd(typeTarget, targetPropsInfos);
         }
 
