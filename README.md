@@ -1,7 +1,9 @@
 # AppoMobi.Specials
+![License](https://img.shields.io/github/license/taublast/DrawnUi.Maui.svg)
+![NuGet Downloads](https://img.shields.io/nuget/dt/AppoMobi.Maui.DrawnUi.svg)
 
-## Varius .Net extensions and helpers for everyday use
+## In-house .NET extensions and helpers 
 
-Docs ToDo
+ 
 
 
