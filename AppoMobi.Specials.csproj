@@ -10,7 +10,7 @@
 	<PropertyGroup>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>8.0.2</Version>
+		<Version>8.0.3</Version>
 		<PackageIcon>icon128.png</PackageIcon>
 		<Description>AppoMobi Helpers For .Net</Description>
 		<Authors>Nick Kovalsky aka AppoMobi</Authors>

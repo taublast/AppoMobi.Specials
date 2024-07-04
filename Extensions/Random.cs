@@ -62,10 +62,10 @@ public static class RndExtensions
         {
             if (doNotRepeatChecksum != null)
                 while (from + max + index == doNotRepeatChecksum.Value)
-                    index = Rnd.Next(0, max + 1);
+                    index = Rnd.Next(from, max + 1);
             else
                 while (from + max + index == lastRandomChecksum)
-                    index = Rnd.Next(0, max + 1);
+                    index = Rnd.Next(from, max + 1);
         }
 
         //Debug.WriteLine($"[RND] final {index}");
