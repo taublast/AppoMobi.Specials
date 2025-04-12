@@ -33,7 +33,7 @@ public static class AttributesExtensions
 	/// <param name="instance"></param>
 	/// <param name="propertyName"></param>
 	/// <returns></returns>
-	public static dynamic GetAttributeProperty<T>(this PropertyInfo instance, string propertyName) where T : Attribute
+	public static object GetAttributeProperty<T>(this PropertyInfo instance, string propertyName) where T : Attribute
 	{
 		var attrType = typeof(T);
 		var hasList = instance.GetCustomAttributes(attrType, false);
@@ -82,9 +82,9 @@ public static class AttributesExtensions
 		return classType.GetCustomAttributes(typeAttribute, true).FirstOrDefault();
 	}
 
-	public static dynamic GetAttribute<T>(this Type classType)
+	public static T GetAttribute<T>(this Type classType)
 	{
-		var dnAttribute = classType.GetCustomAttributes(typeof(T), true).FirstOrDefault();
+		var dnAttribute = (T)classType.GetCustomAttributes(typeof(T), true).FirstOrDefault();
 
 		return dnAttribute;
 	}

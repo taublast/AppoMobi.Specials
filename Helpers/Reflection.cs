@@ -113,7 +113,7 @@ public static class Reflection
     }
 
 
-    public static T Patch<T>(T target, dynamic source) where T : class
+    public static T Patch<T>(T target, object source) where T : class
     {
         JsonConvert.PopulateObject(JsonConvert.SerializeObject(source), target, new JsonSerializerSettings
         {
@@ -164,12 +164,14 @@ public static class Reflection
 
     public static ConcurrentDictionary<Type, PropertyInfo[]> CachedProperties { get; } = new();
 
+    public static bool NeedDebug = false;
+
     /// <summary>
     ///     Set props values with reflection, if fails with sub props use Populate
     /// </summary>
     /// <param name="sourceItem"></param>
     /// <param name="targetItem"></param>
-    public static void MapProperties(dynamic sourceItem, dynamic targetItem)
+    public static void MapProperties(object sourceItem, object targetItem)
     {
         var typeSource = (Type)sourceItem.GetType();
         if (!CachedProperties.TryGetValue(typeSource, out var sourcePropsInfos))
@@ -195,13 +197,16 @@ public static class Reflection
                 if (!string.IsNullOrEmpty(propName))
                 {
                     var val = GetPropertyValueFor(sourceItem, propertyInfo);
-                    var targetProperty = targetPropsInfos.FirstOrDefault(x => x.Name == propName);
-                    targetProperty.SetValue(targetItem, val, null);
+                    var targetProperty = targetPropsInfos.FirstOrDefault(x => x.Name == propName && x.DeclaringType == targetItem.GetType())
+                                         ?? targetPropsInfos.FirstOrDefault(x => x.Name == propName);
+                    if (targetProperty != null) 
+                        targetProperty.SetValue(targetItem, val, null);
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[MapProps] {propName}: {ex}");
+                if (NeedDebug)
+                    Trace.WriteLine($"[MapProperties] {propName}: {ex}");
             }
         }
     }
@@ -234,7 +239,7 @@ public static class Reflection
         return genericMethod.Invoke(null, new[] { self }) as IEnumerable;
     }
 
-    public static bool MapToProperty(this string value, PropertyInfo propertyInfo, dynamic model)
+    public static bool MapToProperty(this string value, PropertyInfo propertyInfo, object model)
     {
         var refF = propertyInfo.ReflectedType;
         var outVal = propertyInfo.GetValue(model);
@@ -405,7 +410,7 @@ public static class Reflection
     }
 
 
-    public static bool MapToProperty(dynamic item, string propertyName, dynamic propertyValue)
+    public static bool MapToProperty(object item, string propertyName, object propertyValue)
     {
         try
         {
@@ -421,7 +426,7 @@ public static class Reflection
     }
 
 
-    public static bool TrySetPropertyValue(dynamic item, string propertyName, dynamic propertyValue)
+    public static bool TrySetPropertyValue(object item, string propertyName, object propertyValue)
     {
         try
         {
@@ -437,7 +442,7 @@ public static class Reflection
         }
     }
 
-    public static dynamic TryGetStaticPropertyValue(Type typeItem, string propertyName)
+    public static object TryGetStaticPropertyValue(Type typeItem, string propertyName)
     {
         try
         {
@@ -450,7 +455,7 @@ public static class Reflection
         return null;
     }
 
-    public static dynamic GetStaticPropertyValue(Type typeItem, string propertyName)
+    public static object GetStaticPropertyValue(Type typeItem, string propertyName)
     {
         if (typeItem == null) return null;
 
@@ -461,7 +466,7 @@ public static class Reflection
         return property.GetValue(null);
     }
 
-    public static void TrySetStaticPropertyValue(Type typeItem, string propertyName, dynamic propertyValue)
+    public static void TrySetStaticPropertyValue(Type typeItem, string propertyName, object propertyValue)
     {
         try
         {
@@ -473,7 +478,7 @@ public static class Reflection
     }
 
 
-    public static dynamic SetStaticPropertyValue(Type typeItem, string propertyName, dynamic propertyValue)
+    public static object SetStaticPropertyValue(Type typeItem, string propertyName, object propertyValue)
     {
         if (typeItem == null) return null;
 
@@ -481,16 +486,30 @@ public static class Reflection
         if (property == null)
             return null;
 
-        return property.SetValue(null, propertyValue);
+        property.SetValue(null, propertyValue);
+
+        return propertyValue;
     }
 
-    public static dynamic GetPropertyValueFor(dynamic item, string propertyName)
+    public static object GetPropertyValueFor(object item, string propertyName)
     {
-        if (item == null) return null;
+        if (item == null) 
+            return null;
         var typeItem = item.GetType();
         var property = typeItem.GetProperty(propertyName);
         if (property == null) return null;
         return property.GetValue(item);
+    }
+
+    public static T GetPropertyValueFor<T>(object item, string propertyName, T defaultValue)
+    {
+        if (item == null) 
+            return defaultValue;
+        var typeItem = typeof(T);
+        var property = typeItem.GetProperty(propertyName);
+        if (property == null) return 
+            defaultValue;
+        return (T)property.GetValue(item);
     }
 
     public static IEnumerable<FieldInfo> GetAllHiddenFields(this Type t)
@@ -506,7 +525,7 @@ public static class Reflection
     }
 
 
-    public static dynamic GetPropertyValueFor(dynamic item, PropertyInfo property)
+    public static object GetPropertyValueFor(object item, PropertyInfo property)
     {
         if (item == null) return null;
         if (property == null) return null;
@@ -514,7 +533,7 @@ public static class Reflection
     }
 
 
-    public static dynamic GetPropertyValueUnsafeFor(dynamic item, string propertyName)
+    public static object GetPropertyValueUnsafeFor(object item, string propertyName)
     {
         if (item == null) return null;
         var typeItem = item.GetType();
@@ -524,7 +543,7 @@ public static class Reflection
     }
 
 
-    public static bool SetPropertyValue(dynamic item, string propertyName, dynamic propertyValue)
+    public static bool SetPropertyValue(object item, string propertyName, object propertyValue)
     {
         var typeItem = item.GetType();
         var property = typeItem.GetProperty(propertyName);
@@ -534,7 +553,7 @@ public static class Reflection
     }
 
 
-    //public static bool SetPropertyValueFor(dynamic item, string propertyName, object propertyValue)
+    //public static bool SetPropertyValueFor(object item, string propertyName, object propertyValue)
 
     //{
     //    var typeItem = item.GetType();
@@ -545,7 +564,7 @@ public static class Reflection
     //}
 
 
-    public static dynamic TryGetPropertyValueFor(dynamic item, string propertyName)
+    public static object TryGetPropertyValueFor(object item, string propertyName)
     {
         try
         {
@@ -562,12 +581,12 @@ public static class Reflection
     }
 
 
-    public static bool TryInvokeMethod(dynamic item, string methodName)
+    public static bool TryInvokeMethod(object item, string methodName)
     {
         var dt = item?.GetType();
         if (dt == null) return false;
         var method = dt.GetMethod(methodName);
-        dynamic result = null;
+        object result = null;
         if (method != null)
             try
             {
@@ -583,13 +602,13 @@ public static class Reflection
 
 
     //
-    //public static bool TryInvokeMethod(dynamic item, string methodName, object param)
+    //public static bool TryInvokeMethod(object item, string methodName, object param)
     //
     //{
     //    var dt = item?.GetType();
     //    if (dt == null) return false;
     //    var method = dt.GetMethod(methodName);
-    //    dynamic result = null;
+    //    object result = null;
     //    object[] parameters = new object[] { new object[] { param } };
     //    if (method != null)
     //    {
@@ -606,12 +625,12 @@ public static class Reflection
     //}
 
 
-    public static bool TryInvokeMethod(dynamic item, string methodName, dynamic param)
+    public static bool TryInvokeMethod(object item, string methodName, object param)
     {
         var dt = item?.GetType();
         if (dt == null) return false;
         var method = dt.GetMethod(methodName);
-        dynamic result = null;
+        object result = null;
         object[] parameters = { param };
         if (method != null)
             try

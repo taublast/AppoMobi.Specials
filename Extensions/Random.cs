@@ -9,7 +9,7 @@ public static class RndExtensions
 {
     private static int lastRandomChecksum = -1;
 
-    private static Random Rnd = new((int)DateTime.Now.Ticks);
+    public static Random Rnd = new((int)DateTime.Now.Ticks);
 
     public static double NextDouble(this Random rnd, double from, double to, double step)
     {
